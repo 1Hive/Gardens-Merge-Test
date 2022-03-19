@@ -1,0 +1,76 @@
+export const MINUTE_IN_SECONDS = 60
+export const HOUR_IN_SECONDS = MINUTE_IN_SECONDS * 60
+export const DAY_IN_SECONDS = HOUR_IN_SECONDS * 24
+export const YEARS_IN_SECONDS = 365 * DAY_IN_SECONDS
+
+// Make a list in the Oxford comma style (eg "a, b, c, and d")
+export const toOxford = (arr, conjunction = 'and', ifempty = '') => {
+  const l = arr.length
+
+  if (!l) {
+    return ifempty
+  }
+  if (l < 2) {
+    return arr[0]
+  }
+  if (l < 3) {
+    return arr.join(` ${conjunction} `)
+  }
+
+  arr = arr.slice()
+  arr[l - 1] = `${conjunction} ${arr[l - 1]}`
+
+  return arr.join(', ')
+}
+
+export const mimeToExtension = (mime) => {
+  switch (mime) {
+    case 'text/markdown':
+      return '.md'
+    case 'text/plain':
+      return '.txt'
+    case 'image/png':
+      return '.png'
+    case 'image/jpeg':
+    case 'image/jpg':
+      return '.jpg'
+    default:
+      return mime
+  }
+}
+
+export const readFile = (reader, file) => {
+  switch (file.type) {
+    case 'text/txt':
+    case 'text/md':
+      reader.readAsText(file)
+      return
+    case 'image/jpg':
+    case 'image/jpeg':
+    case 'image/png':
+      reader.readAsDataURL(file)
+      return
+    default:
+      reader.readAsText(file)
+  }
+}
+
+export function dataURLtoFile(dataurl, filename) {
+  const arr = dataurl.split(',')
+  const mime = arr[0].match(/:(.*?);/)[1]
+  const bstr = window.atob(arr[1])
+  let n = bstr.length
+  const u8arr = new Uint8Array(n)
+
+  while (n--) {
+    u8arr[n] = bstr.charCodeAt(n)
+  }
+
+  return new File([u8arr], filename, { type: mime })
+}
+
+export function textToFile(text, fileName) {
+  return new File([text], fileName, {
+    type: 'text/plain',
+  })
+}
